@@ -1,0 +1,48 @@
+# Base workload for the CI/CD demo app.
+#
+# The sample app (`python -m app.main`) is a BATCH program: it prints a result
+# and exits. A Deployment would therefore CrashLoopBackOff, so the base ships a
+# CronJob that runs it on a schedule. For a long-running service, replace this
+# file with a Deployment + Service (see docs/CD.md) — nothing else changes.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cicd-demo
+spec:
+  # Overlays override the schedule per environment.
+  schedule: "*/10 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: cicd-demo
+        spec:
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: app
+              # Logical image name — `kustomize edit set image cicd-demo-app=...`
+              # in each overlay rewrites this to the immutable GHCR digest.
+              image: cicd-demo-app
+              imagePullPolicy: IfNotPresent
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi

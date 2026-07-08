@@ -1,0 +1,29 @@
+# App-of-Apps root.
+#
+# Bootstrap once:  kubectl apply -n argocd -f apps/root-app.yaml
+# From then on it watches the `apps/` directory of this config repo and creates
+# / updates the per-environment Applications (dev / test / prod) declaratively —
+# add an environment by committing a new Application YAML here, nothing manual.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cicd-demo-root
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    # TODO: point at your GitOps config repo.
+    repoURL: https://github.com/OWNER/baor-demo-config.git
+    targetRevision: main
+    path: apps
+    directory:
+      recurse: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

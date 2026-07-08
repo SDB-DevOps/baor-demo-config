@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cicd-demo-dev
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    # TODO: point at your GitOps config repo.
+    repoURL: https://github.com/OWNER/baor-demo-config.git
+    targetRevision: main
+    path: manifests/overlays/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: baor-demo-dev
+  # dev: fully automated — sync as soon as CI writes a new digest.
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

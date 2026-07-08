@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cicd-demo-prod
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    # TODO: point at your GitOps config repo.
+    repoURL: https://github.com/OWNER/baor-demo-config.git
+    targetRevision: main
+    path: manifests/overlays/prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: baor-demo-prod
+  # prod: automated sync, because the human approval already happened at the
+  # GitHub `environment: production` gate BEFORE CI wrote the digest here
+  # (see prod.yml). For stricter defense-in-depth, drop `automated` to require
+  # a manual Sync in the Argo CD UI as well — see docs/CD.md.
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

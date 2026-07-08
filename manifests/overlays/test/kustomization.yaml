@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: baor-demo-test
+namePrefix: test-
+
+resources:
+  - ../../base
+
+# CI rewrites the digest here on every push to `test`:
+#   kustomize edit set image cicd-demo-app=ghcr.io/<owner>/<repo>@sha256:<digest>
+images:
+  - name: cicd-demo-app
+    newName: ghcr.io/OWNER/baor-demo
+    newTag: test
+
+patches:
+  - target:
+      kind: CronJob
+      name: cicd-demo
+    patch: |
+      - op: replace
+        path: /spec/schedule
+        value: "*/15 * * * *"
