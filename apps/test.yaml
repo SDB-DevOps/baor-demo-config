@@ -8,8 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    # TODO: point at your GitOps config repo.
-    repoURL: https://github.com/OWNER/baor-demo-config.git
+    repoURL: https://github.com/SDB-DevOps/baor-demo-config.git
     targetRevision: main
     path: manifests/overlays/test
   destination:
