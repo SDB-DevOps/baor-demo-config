@@ -5,22 +5,22 @@ namespace: baor-demo-dev
 namePrefix: dev-
 
 resources:
-  - ../../base
+- ../../base
 
 # CI rewrites the digest here on every push to `dev`:
 #   kustomize edit set image cicd-demo-app=ghcr.io/<owner>/<repo>@sha256:<digest>
 # The placeholder below is replaced automatically; keep the name `cicd-demo-app`.
 images:
-  - name: cicd-demo-app
-    newName: ghcr.io/OWNER/baor-demo
-    newTag: dev
+- digest: sha256:7378bd28fcd92d26ced3d0dd54533f67bd7e2c6915571b533a160fcf910cfe0e
+  name: cicd-demo-app
+  newName: ghcr.io/sdb-devops/baor-demo
 
 # Dev runs frequently for fast feedback.
 patches:
-  - target:
-      kind: CronJob
-      name: cicd-demo
-    patch: |
-      - op: replace
-        path: /spec/schedule
-        value: "*/5 * * * *"
+- patch: |
+    - op: replace
+      path: /spec/schedule
+      value: "*/5 * * * *"
+  target:
+    kind: CronJob
+    name: cicd-demo
