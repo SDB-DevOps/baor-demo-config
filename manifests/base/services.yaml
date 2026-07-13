@@ -1,0 +1,26 @@
+# Two Services for the blue-green rollout.
+#   active  -> production traffic (Argo Rollouts flips its selector on promote)
+#   preview -> the candidate (green) version, for verification before promote
+# Argo Rollouts injects the rollouts-pod-template-hash into each selector at
+# runtime; we only declare the app selector here.
+apiVersion: v1
+kind: Service
+metadata:
+  name: cicd-demo-active
+spec:
+  selector:
+    app: cicd-demo
+  ports:
+    - port: 80
+      targetPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cicd-demo-preview
+spec:
+  selector:
+    app: cicd-demo
+  ports:
+    - port: 80
+      targetPort: 8000

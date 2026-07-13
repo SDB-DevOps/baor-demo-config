@@ -1,26 +1,32 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+# namePrefix intentionally omitted: the Rollout references its Services by name
+# (strategy.blueGreen.active/previewService) and kustomize would not rewrite
+# those CRD fields. Namespace isolation is enough.
 namespace: baor-demo-dev
-namePrefix: dev-
 
 resources:
 - ../../base
 
 # CI rewrites the digest here on every push to `dev`:
 #   kustomize edit set image cicd-demo-app=ghcr.io/<owner>/<repo>@sha256:<digest>
-# The placeholder below is replaced automatically; keep the name `cicd-demo-app`.
+# Keep the name `cicd-demo-app`.
 images:
-- digest: sha256:7378bd28fcd92d26ced3d0dd54533f67bd7e2c6915571b533a160fcf910cfe0e
-  name: cicd-demo-app
+- name: cicd-demo-app
   newName: ghcr.io/sdb-devops/baor-demo
+  newTag: dev
 
-# Dev runs frequently for fast feedback.
+# dev: auto-promote (behaves like a fast rolling update — no manual gate) and
+# label the running version for visibility in /healthz.
 patches:
-- patch: |
-    - op: replace
-      path: /spec/schedule
-      value: "*/5 * * * *"
-  target:
-    kind: CronJob
+- target:
+    kind: Rollout
     name: cicd-demo
+  patch: |
+    - op: replace
+      path: /spec/strategy/blueGreen/autoPromotionEnabled
+      value: true
+    - op: replace
+      path: /spec/template/spec/containers/0/env/0/value
+      value: dev

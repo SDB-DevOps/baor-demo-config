@@ -1,28 +1,31 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+# namePrefix omitted — see dev overlay for why (Rollout Service name refs).
 namespace: baor-demo-prod
-namePrefix: prod-
 
 resources:
-  - ../../base
+- ../../base
 
-# CI rewrites the digest here after the production approval gate passes:
-#   kustomize edit set image cicd-demo-app=ghcr.io/<owner>/<repo>@sha256:<digest>
+# CI rewrites the digest here after the production approval gate passes.
 images:
-  - name: cicd-demo-app
-    newName: ghcr.io/OWNER/baor-demo
-    newTag: prod
+- name: cicd-demo-app
+  newName: ghcr.io/sdb-devops/baor-demo
+  newTag: prod
 
-# Production runs once a day; give it a little more headroom.
+# prod: keep autoPromotionEnabled=false (base default) so a new version comes up
+# on the PREVIEW service and waits for a manual promote — the real blue-green
+# gate. Give it a bit more memory headroom, and label the version.
+# (To automate promotion later, add strategy.blueGreen.prePromotionAnalysis with
+#  an AnalysisTemplate backed by Prometheus — see docs/CD.md.)
 patches:
-  - target:
-      kind: CronJob
-      name: cicd-demo
-    patch: |
-      - op: replace
-        path: /spec/schedule
-        value: "0 3 * * *"
-      - op: replace
-        path: /spec/jobTemplate/spec/template/spec/containers/0/resources/limits/memory
-        value: 128Mi
+- target:
+    kind: Rollout
+    name: cicd-demo
+  patch: |
+    - op: replace
+      path: /spec/template/spec/containers/0/env/0/value
+      value: prod
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/limits/memory
+      value: 128Mi

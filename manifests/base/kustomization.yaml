@@ -3,7 +3,8 @@ kind: Kustomization
 
 # Common resources shared by every environment overlay.
 resources:
-  - cronjob.yaml
+  - rollout.yaml
+  - services.yaml
 
 # Labels applied to all resources for consistent selection / ownership.
 labels:

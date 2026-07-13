@@ -1,24 +1,27 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+# namePrefix omitted — see dev overlay for why (Rollout Service name refs).
 namespace: baor-demo-test
-namePrefix: test-
 
 resources:
-  - ../../base
+- ../../base
 
-# CI rewrites the digest here on every push to `test`:
-#   kustomize edit set image cicd-demo-app=ghcr.io/<owner>/<repo>@sha256:<digest>
+# CI rewrites the digest here on every push to `test`.
 images:
-  - name: cicd-demo-app
-    newName: ghcr.io/OWNER/baor-demo
-    newTag: test
+- name: cicd-demo-app
+  newName: ghcr.io/sdb-devops/baor-demo
+  newTag: test
 
+# test: auto-promote as well (the test branch already gates on integration tests).
 patches:
-  - target:
-      kind: CronJob
-      name: cicd-demo
-    patch: |
-      - op: replace
-        path: /spec/schedule
-        value: "*/15 * * * *"
+- target:
+    kind: Rollout
+    name: cicd-demo
+  patch: |
+    - op: replace
+      path: /spec/strategy/blueGreen/autoPromotionEnabled
+      value: true
+    - op: replace
+      path: /spec/template/spec/containers/0/env/0/value
+      value: test
