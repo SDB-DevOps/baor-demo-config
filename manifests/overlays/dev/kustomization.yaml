@@ -13,20 +13,20 @@ resources:
 #   kustomize edit set image cicd-demo-app=ghcr.io/<owner>/<repo>@sha256:<digest>
 # Keep the name `cicd-demo-app`.
 images:
-- name: cicd-demo-app
+- digest: sha256:488edf51e778931d26044313cc9a753e87779021c92d640ce4d2927349d098e3
+  name: cicd-demo-app
   newName: ghcr.io/sdb-devops/baor-demo
-  newTag: dev
 
 # dev: auto-promote (behaves like a fast rolling update — no manual gate) and
 # label the running version for visibility in /healthz.
 patches:
-- target:
-    kind: Rollout
-    name: cicd-demo
-  patch: |
+- patch: |
     - op: replace
       path: /spec/strategy/blueGreen/autoPromotionEnabled
       value: true
     - op: replace
       path: /spec/template/spec/containers/0/env/0/value
       value: dev
+  target:
+    kind: Rollout
+    name: cicd-demo
