@@ -9,19 +9,19 @@ resources:
 
 # CI rewrites the digest here on every push to `test`.
 images:
-- name: cicd-demo-app
+- digest: sha256:59b424ee479627d5a5eb5d1d75adf951f9bbda60fb4e49aba89637fd588eb4c2
+  name: cicd-demo-app
   newName: ghcr.io/sdb-devops/baor-demo
-  newTag: test
 
 # test: auto-promote as well (the test branch already gates on integration tests).
 patches:
-- target:
-    kind: Rollout
-    name: cicd-demo
-  patch: |
+- patch: |
     - op: replace
       path: /spec/strategy/blueGreen/autoPromotionEnabled
       value: true
     - op: replace
       path: /spec/template/spec/containers/0/env/0/value
       value: test
+  target:
+    kind: Rollout
+    name: cicd-demo
