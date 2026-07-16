@@ -13,7 +13,7 @@ resources:
 #   kustomize edit set image cicd-demo-app=ghcr.io/<owner>/<repo>@sha256:<digest>
 # Keep the name `cicd-demo-app`.
 images:
-- digest: sha256:4d8e9a96140e115464dcac6cbe4fe119050d4841c56661b43e778887bb503786
+- digest: sha256:9b54ae8df1b99e6a5da67b173c1e574cad2ee60b3aabcfa24fa401c300b546d4
   name: cicd-demo-app
   newName: ghcr.io/sdb-devops/baor-demo
 
