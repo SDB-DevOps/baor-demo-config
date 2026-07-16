@@ -9,7 +9,7 @@ resources:
 
 # CI rewrites the digest here after the production approval gate passes.
 images:
-- digest: sha256:84e01d9e4a129156eefa6733f15f0ebd3830d0408aac4399073b7afdcbcbf710
+- digest: sha256:1fafb3727958d2e80e629c5941e0ed5e2c67ca486cb825bf0782bbd198cecd5b
   name: cicd-demo-app
   newName: ghcr.io/sdb-devops/baor-demo
 
