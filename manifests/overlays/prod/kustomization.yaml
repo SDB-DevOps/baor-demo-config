@@ -13,9 +13,9 @@ components:
 
 # CI rewrites the digest here after the production approval gate passes.
 images:
-- name: cicd-demo-app
+- digest: sha256:1fafb3727958d2e80e629c5941e0ed5e2c67ca486cb825bf0782bbd198cecd5b
+  name: cicd-demo-app
   newName: ghcr.io/sdb-devops/baor-demo
-  newTag: prod
 
 # prod: keep autoPromotionEnabled=false (base default) so a new version comes up
 # on the PREVIEW service and waits for a manual promote — the real blue-green
@@ -23,13 +23,13 @@ images:
 # (To automate promotion later, add strategy.blueGreen.prePromotionAnalysis with
 #  an AnalysisTemplate backed by Prometheus — see docs/CD.md.)
 patches:
-- target:
-    kind: Rollout
-    name: cicd-demo
-  patch: |
+- patch: |
     - op: replace
       path: /spec/template/spec/containers/0/env/0/value
       value: prod
     - op: replace
       path: /spec/template/spec/containers/0/resources/limits/memory
       value: 128Mi
+  target:
+    kind: Rollout
+    name: cicd-demo
