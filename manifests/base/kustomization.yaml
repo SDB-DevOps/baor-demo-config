@@ -1,10 +1,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-# Common resources shared by every environment overlay.
+# Common workload shared by every environment overlay.
+# Services + release strategy come from a strategy Component (blue-green / canary).
 resources:
   - rollout.yaml
-  - services.yaml
 
 # Labels applied to all resources for consistent selection / ownership.
 labels:

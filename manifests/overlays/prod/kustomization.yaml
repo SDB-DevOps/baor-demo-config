@@ -7,6 +7,10 @@ namespace: baor-demo-prod
 resources:
 - ../../base
 
+# Release strategy for prod = blue-green (swap to ../../components/canary to switch).
+components:
+- ../../components/blue-green
+
 # CI rewrites the digest here after the production approval gate passes.
 images:
 - name: cicd-demo-app

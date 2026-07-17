@@ -1,0 +1,22 @@
+# Injected into the base Rollout: canary strategy with precise % traffic shifting
+# via ingress-nginx. Traffic ramps 20% → 50% → 100% with pauses between steps.
+# Replace a `pause: {duration}` with `pause: {}` to make a step wait for a manual
+# `kubectl argo rollouts promote` (e.g. a human gate before 100%).
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: cicd-demo
+spec:
+  strategy:
+    canary:
+      canaryService: cicd-demo-canary
+      stableService: cicd-demo-stable
+      trafficRouting:
+        nginx:
+          stableIngress: cicd-demo
+      steps:
+        - setWeight: 20
+        - pause: { duration: 30s }
+        - setWeight: 50
+        - pause: { duration: 30s }
+        - setWeight: 100

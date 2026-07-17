@@ -7,21 +7,22 @@ namespace: baor-demo-test
 resources:
 - ../../base
 
+# Release strategy for test = canary (swap to ../../components/blue-green to switch).
+components:
+- ../../components/canary
+
 # CI rewrites the digest here on every push to `test`.
 images:
 - name: cicd-demo-app
   newName: ghcr.io/sdb-devops/baor-demo
   newTag: test
 
-# test: auto-promote as well (the test branch already gates on integration tests).
+# Label the running version for visibility in /healthz (strategy-agnostic path).
 patches:
 - target:
     kind: Rollout
     name: cicd-demo
   patch: |
-    - op: replace
-      path: /spec/strategy/blueGreen/autoPromotionEnabled
-      value: true
     - op: replace
       path: /spec/template/spec/containers/0/env/0/value
       value: test

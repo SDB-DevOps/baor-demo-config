@@ -1,10 +1,10 @@
-# Argo Rollouts blue-green workload (replaces the old batch CronJob).
+# Argo Rollouts workload (replaces the old batch CronJob).
 #
-# Blue-green: a new version (green) is brought up at full scale alongside the
-# current one (blue). The preview Service points at green for verification; on
-# promote, the active Service flips to green and blue is scaled down after a
-# short delay (fast rollback window). Requires the Argo Rollouts controller in
-# the cluster (see docs/CD-RUNBOOK.md).
+# NOTE: this base intentionally has NO `strategy` block. The release strategy
+# (blue-green OR canary) is injected by a Kustomize Component that each overlay
+# selects — see manifests/components/ and docs/RELEASE-STRATEGIES.md.
+# Building this base alone yields a Rollout without a strategy (never applied
+# directly); every overlay pulls in exactly one strategy component.
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
@@ -61,9 +61,4 @@ spec:
             limits:
               cpu: 100m
               memory: 64Mi
-  strategy:
-    blueGreen:
-      activeService: cicd-demo-active     # receives production traffic
-      previewService: cicd-demo-preview   # points at the new (green) version
-      autoPromotionEnabled: false         # base default: manual promote (overridden in dev/test)
-      scaleDownDelaySeconds: 60           # keep old version 60s after switch for quick rollback
+  # strategy is injected by a component (blue-green / canary) — see overlays.

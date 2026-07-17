@@ -1,0 +1,25 @@
+# Two Services for the canary rollout.
+#   stable -> the current stable version (receives the bulk of traffic)
+#   canary -> the new version under gradual rollout
+# Argo Rollouts manages the pod-template-hash selectors and the traffic weights.
+apiVersion: v1
+kind: Service
+metadata:
+  name: cicd-demo-stable
+spec:
+  selector:
+    app: cicd-demo
+  ports:
+    - port: 80
+      targetPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cicd-demo-canary
+spec:
+  selector:
+    app: cicd-demo
+  ports:
+    - port: 80
+      targetPort: 8000

@@ -1,0 +1,15 @@
+# Injected into the base Rollout: blue-green strategy.
+# autoPromotionEnabled=false → new version comes up on the preview Service and
+# waits for a manual `kubectl argo rollouts promote` (the real blue-green gate).
+# An overlay that wants auto-promote can override this single field.
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: cicd-demo
+spec:
+  strategy:
+    blueGreen:
+      activeService: cicd-demo-active
+      previewService: cicd-demo-preview
+      autoPromotionEnabled: false
+      scaleDownDelaySeconds: 60

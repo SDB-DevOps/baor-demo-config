@@ -1,0 +1,24 @@
+# Stable Ingress for the canary rollout. Argo Rollouts clones this into a
+# "<name>-canary" Ingress and adjusts nginx canary-weight annotations per step,
+# so traffic is split by exact percentage between stable and canary Services.
+#
+# Adjust `host` to your environment's DNS (or test via curl with a Host header).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cicd-demo
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: cicd-demo.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cicd-demo-stable
+                port:
+                  number: 80

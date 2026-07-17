@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+# Canary strategy: adds the canary/stable Services + an nginx Ingress, and
+# injects spec.strategy.canary into the base Rollout. Selected by an overlay via
+# `components: [../../components/canary]`.
+#
+# Precise % traffic shifting needs an ingress controller (ingress-nginx here).
+# See docs/RELEASE-STRATEGIES.md §5 for the cluster prerequisite (and the k3s /
+# Traefik note). To use a different router, swap trafficRouting in strategy.yaml
+# and the ingress.yaml resource.
+resources:
+  - services.yaml
+  - ingress.yaml
+
+patches:
+  - path: strategy.yaml
+    target:
+      kind: Rollout
+      name: cicd-demo
