@@ -15,8 +15,10 @@ spec:
         nginx:
           stableIngress: cicd-demo
       steps:
-        - setWeight: 20
-        - pause: { duration: 30s }
-        - setWeight: 50
-        - pause: { duration: 30s }
+        - setWeight: 10
+        - pause: { }
+        - setWeight: 30
+        - pause: { }
+        - setWeight: 60
+        - pause: { }
         - setWeight: 100
